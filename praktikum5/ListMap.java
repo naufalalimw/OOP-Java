@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 class ListMap<K, V> implements Map<K, V> {
     private ListElement first;
-    private List<Map<K,V>> mList;
   
     /**
      * Kelas ListElement yang diimplementasikan sebagai InnerClass
@@ -30,18 +29,26 @@ class ListMap<K, V> implements Map<K, V> {
        * Menghitung panjang rantai ListElement yang ada (terhitung dari elemen *ini*)
        * Mungkin diperlukan untuk menghitung size()
        */
-    //   private int length() {
-    //     // Your code goes here :)
-    //   }
+      private int length() {
+        if (this.next == null){
+          return 1;
+        } else {
+          return 1 + this.next.length();
+        }
+      }
   
       /**
        * HINTED METHOD (Boleh dihilangkan jika tidak digunakan)
        * Mengembalikan ListElement yang terletak pada ujung rantai ListElement
        * Mungkin diperlukan ketika menambahkan elemen yang belum terdapat pada map. :)
        */
-    //   private ListElement getLast() {
-    //     // Your code goes here :)
-    //   }
+      private ListElement getLast() {
+        if (this.next == null){
+          return this;
+        } else {
+          return this.next.getLast();
+        }
+      }
     }
   
     /**
@@ -49,8 +56,7 @@ class ListMap<K, V> implements Map<K, V> {
      * Set first = null
      */
     public ListMap() {
-      mList = new ArrayList<Map<K,V>>();
-      first = new ListElement(null, null);
+      first = null;
     }
   
     /**
@@ -58,8 +64,27 @@ class ListMap<K, V> implements Map<K, V> {
      * Melakukan overwrite jika sudah terdapat elemen dengan key yang sama.
      */
     public void add(K key, V value) {
-      ListElement tambah = new ListElement(key, value);
-      mList.add((Map<K,V>)tambah);
+      if (size() == 0){
+        ListElement nl = new ListElement(key, value);
+        first = nl;
+      } else {
+        //int i = 0;
+        ListElement trueFirst = first;
+        while(first != null){
+          //i++;
+          //System.out.println(i);
+          if(first.key.equals(key)){
+            first.value = value;
+          } else {
+            first = first.next;
+          }
+        }
+        if (first == null){
+          trueFirst.getLast().next = new ListElement(key, value);
+        }
+  
+        first = trueFirst;
+      }
     }
   
     /**
@@ -67,19 +92,32 @@ class ListMap<K, V> implements Map<K, V> {
      * Mengembalikan null apabila map tidak mengandung key masukan.
      */
     public V get(K key) {
-      V val = null;
-      for (int i = 0; i < mList.size(); i++) {
-        ListElement l = (ListElement) mList.get(i);
-          if (key.equals(l.key)) {
-              val = l.value;
-          }
+      ListElement tempL;
+      ListElement firstStat = first;
+      V tempV = null;
+      if (firstStat == null){
+        return null;
+      }else if (first == null){
+        return null;
+      } else if (first.key.equals(key)){
+         return first.value;
+      } else {
+        tempL = first;
+        first = first.next;
+        tempV = get(key);
+        first = tempL;
+        return tempV;
       }
-      return val;
     }
   
     /**
      * Menghitung jumlah elemen yang ada pada map
      */
     public int size() {
-      return mList.size(); }
+      if (first == null){
+        return 0;
+      } else {
+        return first.length();
+      }
+    }
   }
